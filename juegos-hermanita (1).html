@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juegos 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #FDF6FF;
+    --orange: #FF6B35;
+    --orange2: #FF9A6C;
+    --blue: #185FA5;
+    --blue2: #5A9FE0;
+    --green: #1A9E5C;
+    --green-light: #E8FAF1;
+    --red: #D03030;
+    --red-light: #FFF0F0;
+    --radius: 20px;
+    --shadow: 0 6px 28px rgba(0,0,0,0.11);
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, #e8b4f8 1.5px, transparent 1.5px), radial-gradient(circle, #b4d4f8 1px, transparent 1px);
+    background-size: 60px 60px, 30px 30px;
+    background-position: 0 0, 15px 15px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; position: relative; z-index: 1; }
+  .screen.active { display: block; }
+
+  /* ══════════════════════════════
+     HOME
+  ══════════════════════════════ */
+  #home {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 44px 20px 60px;
+  }
+  #home.active { display: flex; }
+
+  .hero { text-align: center; margin-bottom: 44px; animation: fadeDown 0.5s ease both; }
+  .hero-emoji { font-size: clamp(3rem,10vw,5rem); display: block; margin-bottom: 10px; animation: bounce 2.5s infinite; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .hero h1 { font-size: clamp(1.8rem,6vw,3rem); font-weight: 900; color: #1A1A2E; margin-bottom: 8px; }
+  .hero p { font-size: clamp(0.9rem,3vw,1.1rem); color: #666; font-weight: 600; }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-18px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:translateY(0)} }
+
+  .games {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 22px;
+    width: 100%;
+    max-width: 680px;
+  }
+
+  .game-card {
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .game-card:nth-child(1) { animation-delay: 0.1s; }
+  .game-card:nth-child(2) { animation-delay: 0.22s; }
+  .game-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 14px 44px rgba(0,0,0,0.15); }
+
+  .card-header { padding: 28px 24px 22px; }
+  .card-1 .card-header { background: linear-gradient(135deg, var(--orange), var(--orange2)); }
+  .card-2 .card-header { background: linear-gradient(135deg, var(--blue), var(--blue2)); }
+  .card-icon { font-size: 3rem; display: block; margin-bottom: 10px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.18)); }
+  .card-header h2 { font-size: clamp(1.1rem,4vw,1.4rem); font-weight: 900; color: #fff; margin-bottom: 6px; }
+  .card-header p { font-size: 0.85rem; color: rgba(255,255,255,0.88); font-weight: 600; }
+
+  .card-body { background: #fff; padding: 18px 24px 22px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .tag { padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+  .card-1 .tag { background: #FFF0EA; color: var(--orange); }
+  .card-2 .tag { background: #E6F1FB; color: var(--blue); }
+
+  .play-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 14px;
+    border: none;
+    font-size: 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    cursor: pointer;
+    color: #fff;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .card-1 .play-btn { background: var(--orange); }
+  .card-2 .play-btn { background: var(--blue); }
+  .play-btn:hover { opacity: 0.88; transform: scale(1.01); }
+
+  footer { text-align: center; font-size: 0.82rem; color: #bbb; font-weight: 600; margin-top: 44px; }
+  footer span { color: var(--orange); }
+
+  /* ══════════════════════════════
+     GAME SCREEN SHARED
+  ══════════════════════════════ */
+  .game-screen { padding: 0; }
+
+  .game-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: #fff;
+    border-bottom: 1.5px solid #f0f0f0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .game-nav h2 { font-size: 1rem; font-weight: 900; color: #1A1A2E; }
+
+  .back-btn {
+    background: #f0f0f0;
+    border: none;
+    border-radius: 99px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    color: #333;
+    transition: background 0.15s;
+  }
+  .back-btn:hover { background: #e2e2e2; }
+
+  .game-inner {
+    padding: 20px 16px 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ══════════════════════════════
+     SHARED COMPONENTS
+  ══════════════════════════════ */
+  .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; width:100%; max-width:540px; }
+  .stats { display:flex; gap:14px; }
+  .stat { font-size:13px; color:#666; font-weight:600; }
+  .stat b { color:#1A1A2E; font-weight:900; }
+  .g-btn { padding:7px 16px; font-size:13px; font-family:'Nunito',sans-serif; font-weight:700; border-radius:99px; border:none; background:#1A1A2E; color:#fff; cursor:pointer; transition:opacity 0.15s; }
+  .g-btn:hover { opacity:0.82; }
+  .g-btn.secondary { background:#f0f0f0; color:#333; }
+  .g-btn.secondary:hover { background:#e0e0e0; }
+
+  .progress-wrap { width:100%; max-width:540px; height:7px; background:#eee; border-radius:99px; margin-bottom:16px; overflow:hidden; }
+  .progress-bar { height:100%; border-radius:99px; transition:width 0.4s ease; }
+  .p-orange { background:var(--orange); }
+  .p-blue   { background:var(--blue); }
+
+  /* ══════════════════════════════
+     MEMORAMA DE MATEMÁTICAS
+  ══════════════════════════════ */
+  .mat-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: clamp(8px,2vw,13px);
+    width: 100%;
+    max-width: 540px;
+  }
+
+  .mcard {
+    aspect-ratio: 1;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.18s, box-shadow 0.18s;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+    border: 3px solid transparent;
+    position: relative;
+  }
+
+  .mcard.back {
+    background: linear-gradient(135deg,var(--orange),var(--orange2));
+    color: #fff;
+    font-size: clamp(1.4rem,5vw,2rem);
+  }
+  .mcard.back:hover { transform:scale(1.07); box-shadow:0 8px 24px rgba(255,107,53,0.35); }
+  .mcard.op  { background:#EEF1FF; color:#2D4CC8; border-color:#C5CDFF; font-size:clamp(0.82rem,2.8vw,1.1rem); }
+  .mcard.num { background:#E8FAF1; color:var(--green); border-color:#A8EDD0; font-size:clamp(1rem,3.5vw,1.5rem); }
+
+  .mcard.matched {
+    background:#E8FAF1; border-color:var(--green); color:var(--green);
+    cursor:default; animation: mpop 0.3s ease;
+  }
+  .mcard.matched::after { content:'✓'; position:absolute; top:4px; right:7px; font-size:0.65rem; }
+  @keyframes mpop { 0%{transform:scale(0.9)} 60%{transform:scale(1.1)} 100%{transform:scale(1)} }
+  @keyframes mshake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
+  .mcard.shake { animation:mshake 0.35s ease; }
+
+  .feedback { text-align:center; font-size:1rem; font-weight:700; min-height:28px; margin-top:12px; }
+  .fb-ok { color:var(--green); }
+  .fb-no { color:var(--red); }
+
+  /* ══════════════════════════════
+     INGLÉS - ANIMALES
+  ══════════════════════════════ */
+  .question-card {
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding: clamp(1.2rem,4vw,2rem);
+    text-align:center;
+    width:100%; max-width:480px;
+    margin-bottom:16px;
+  }
+
+  .animal-emoji { font-size:clamp(3.5rem,12vw,5rem); display:block; margin-bottom:10px; line-height:1; }
+  .q-label { font-size:0.78rem; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+  .q-word { font-size:clamp(1.5rem,6vw,2.2rem); font-weight:900; color:#1A1A2E; margin-bottom:14px; }
+
+  .speak-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 18px; font-size:13px; font-family:'Nunito',sans-serif; font-weight:700;
+    border-radius:99px; border:2px solid var(--blue);
+    background:#E6F1FB; color:var(--blue); cursor:pointer; transition:background 0.15s;
+  }
+  .speak-btn:hover { background:#cfe3f7; }
+  .speak-btn.speaking { background:var(--blue); color:#fff; }
+
+  .opts-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; max-width:480px; margin-bottom:12px; }
+
+  .opt {
+    background:#fff; border:2.5px solid #dde8f5; border-radius:16px;
+    padding:clamp(0.75rem,3vw,1rem); font-size:clamp(0.92rem,3vw,1.05rem);
+    font-family:'Nunito',sans-serif; font-weight:700;
+    cursor:pointer; text-align:center; color:#1A1A2E;
+    box-shadow:0 3px 12px rgba(0,0,0,0.07);
+    transition:transform 0.12s, border-color 0.12s;
+  }
+  .opt:hover:not(:disabled) { transform:scale(1.03); border-color:var(--blue); }
+  .opt:disabled { cursor:default; }
+  .opt.correct { background:var(--green-light); border-color:var(--green); color:var(--green); }
+  .opt.wrong   { background:var(--red-light);   border-color:var(--red);   color:var(--red); }
+
+  /* ══════════════════════════════
+     END SCREEN
+  ══════════════════════════════ */
+  .endbox { text-align:center; padding:2rem 1rem; animation:fadeUp 0.4s ease both; }
+  .end-emoji { font-size:3.5rem; display:block; margin-bottom:8px; }
+  .end-title { font-size:1.4rem; font-weight:900; color:#1A1A2E; margin-bottom:4px; }
+  .end-sub   { font-size:0.9rem; color:#666; margin-bottom:24px; }
+
+  @media (max-width:360px) {
+    .mat-grid { gap:6px; }
+    .mcard { border-radius:10px; }
+    .opts-grid { gap:8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ HOME ══════════ -->
+<div id="home" class="screen active">
+  <div class="hero">
+    <span class="hero-emoji">🌟</span>
+    <h1>¡Mis Juegos!</h1>
+    <p>Aprende jugando · Elige tu juego favorito</p>
+  </div>
+
+  <div class="games">
+    <div class="game-card card-1" onclick="goTo('mat')">
+      <div class="card-header">
+        <span class="card-icon">🔢</span>
+        <h2>Memorama de Matemáticas</h2>
+        <p>Encuentra la pareja entre la suma y su resultado</p>
+      </div>
+      <div class="card-body">
+        <div class="tags">
+          <span class="tag">Sumas</span>
+          <span class="tag">Memoria</span>
+          <span class="tag">Números</span>
+        </div>
+        <button class="play-btn">▶ ¡Jugar ahora!</button>
+      </div>
+    </div>
+
+    <div class="game-card card-2" onclick="goTo('ing')">
+      <div class="card-header">
+        <span class="card-icon">🐾</span>
+        <h2>Aprende Inglés</h2>
+        <p>Adivina cómo se llaman los animales en inglés</p>
+      </div>
+      <div class="card-body">
+        <div class="tags">
+          <span class="tag">Inglés</span>
+          <span class="tag">Animales</span>
+          <span class="tag">Voz</span>
+        </div>
+        <button class="play-btn">▶ ¡Jugar ahora!</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Hecho con <span>♥</span> para aprender jugando</footer>
+</div>
+
+<!-- ══════════ MATEMÁTICAS ══════════ -->
+<div id="mat" class="screen game-screen">
+  <div class="game-nav">
+    <h2>🔢 Memorama de Matemáticas</h2>
+    <button class="back-btn" onclick="goTo('home')">← Inicio</button>
+  </div>
+  <div class="game-inner">
+    <div class="topbar">
+      <div class="stats">
+        <div class="stat">Parejas: <b id="m-pairs">0</b>/8</div>
+        <div class="stat">Intentos: <b id="m-tries">0</b></div>
+      </div>
+      <button class="g-btn" onclick="matInit()">🔀 Nueva</button>
+    </div>
+    <div class="mat-grid" id="mat-grid"></div>
+    <div class="feedback" id="m-fb"></div>
+  </div>
+</div>
+
+<!-- ══════════ INGLÉS ══════════ -->
+<div id="ing" class="screen game-screen">
+  <div class="game-nav">
+    <h2>🐾 Aprende Inglés</h2>
+    <button class="back-btn" onclick="goTo('home')">← Inicio</button>
+  </div>
+  <div class="game-inner">
+    <div class="topbar" style="max-width:480px;">
+      <div class="stats">
+        <div class="stat">Aciertos: <b id="i-score">0</b></div>
+        <div class="stat">Pregunta: <b id="i-qnum">1</b>/10</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="g-btn secondary" id="i-soundbtn" onclick="toggleSound()">🔊</button>
+        <button class="g-btn" onclick="ingInit()">🔀 Nueva</button>
+      </div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar p-blue" id="i-bar" style="width:0%"></div></div>
+    <div id="ing-game">
+      <div class="question-card">
+        <span class="animal-emoji" id="i-emoji"></span>
+        <div class="q-label" id="i-label"></div>
+        <div class="q-word" id="i-word"></div>
+        <button class="speak-btn" id="i-speakbtn" onclick="speakCurrent()">🔊 Escuchar</button>
+      </div>
+      <div class="opts-grid" id="i-opts"></div>
+      <div class="feedback" id="i-fb"></div>
+    </div>
+    <div id="ing-end" style="display:none;width:100%;max-width:480px;"></div>
+  </div>
+</div>
+
+<script>
+/* ══════ NAVIGATION ══════ */
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='mat') matInit();
+  if(id==='ing') ingInit();
+  if(id==='home' && window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
+/* ══════ MEMORAMA MATEMÁTICAS ══════ */
+const matPairs=[
+  {op:'1 + 1',res:'2'},{op:'2 + 1',res:'3'},{op:'2 + 2',res:'4'},{op:'3 + 2',res:'5'},
+  {op:'3 + 3',res:'6'},{op:'4 + 3',res:'7'},{op:'5 + 3',res:'8'},{op:'5 + 4',res:'9'},
+];
+let mFlipped=[],mMatched=0,mTries=0,mLock=false;
+
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+
+function matInit(){
+  mFlipped=[];mMatched=0;mTries=0;mLock=false;
+  document.getElementById('m-pairs').textContent=0;
+  document.getElementById('m-tries').textContent=0;
+  document.getElementById('m-fb').textContent='';
+  document.getElementById('m-fb').className='feedback';
+  const cards=shuffle([
+    ...matPairs.map((p,i)=>({id:i,type:'op',label:p.op})),
+    ...matPairs.map((p,i)=>({id:i,type:'res',label:p.res})),
+  ]);
+  const grid=document.getElementById('mat-grid');
+  grid.innerHTML='';
+  cards.forEach((c,idx)=>{
+    const el=document.createElement('div');
+    el.className='mcard back';
+    el.textContent='?';
+    el.addEventListener('click',()=>mFlip(el,c));
+    grid.appendChild(el);
+  });
+}
+
+function mFlip(el,c){
+  if(mLock||!el.classList.contains('back'))return;
+  el.classList.remove('back');
+  el.classList.add(c.type==='op'?'op':'num');
+  el.textContent=c.label;
+  mFlipped.push({el,c});
+  if(mFlipped.length===2){
+    mLock=true; mTries++;
+    document.getElementById('m-tries').textContent=mTries;
+    const[a,b]=mFlipped;
+    if(a.c.id===b.c.id&&a.c.type!==b.c.type){
+      a.el.classList.replace(a.c.type==='op'?'op':'num','matched');
+      b.el.classList.replace(b.c.type==='op'?'op':'num','matched');
+      mMatched++;
+      document.getElementById('m-pairs').textContent=mMatched;
+      const fb=document.getElementById('m-fb');
+      fb.textContent='¡Muy bien! ✓'; fb.className='feedback fb-ok';
+      mFlipped=[];mLock=false;
+      if(mMatched===matPairs.length)setTimeout(mEnd,500);
+    } else {
+      const fb=document.getElementById('m-fb');
+      fb.textContent='¡Sigue intentando!'; fb.className='feedback fb-no';
+      [a,b].forEach(x=>x.el.classList.add('shake'));
+      setTimeout(()=>{
+        [a,b].forEach(x=>{x.el.classList.remove('shake');x.el.className='mcard back';x.el.textContent='?';});
+        fb.textContent=''; fb.className='feedback';
+        mFlipped=[];mLock=false;
+      },900);
+    }
+  }
+}
+
+function mEnd(){
+  const fb=document.getElementById('m-fb');
+  const s=mTries<=10?'🏆':mTries<=16?'⭐':'💪';
+  const m=mTries<=10?'¡Eres una campeona!':mTries<=16?'¡Muy bien hecho!':'¡Lo lograste!';
+  document.getElementById('mat-grid').innerHTML=`<div style="grid-column:1/-1;" class="endbox">
+    <span class="end-emoji">${s}</span>
+    <div class="end-title">${m}</div>
+    <div class="end-sub">Lo lograste en <strong>${mTries}</strong> intentos</div>
+    <button class="g-btn" onclick="matInit()">🔀 Jugar de nuevo</button>
+  </div>`;
+  fb.textContent='';
+}
+
+/* ══════ INGLÉS ANIMALES ══════ */
+const animals=[
+  {es:'Perro',en:'Dog',emoji:'🐶'},{es:'Gato',en:'Cat',emoji:'🐱'},
+  {es:'Caballo',en:'Horse',emoji:'🐴'},{es:'Vaca',en:'Cow',emoji:'🐮'},
+  {es:'Cerdo',en:'Pig',emoji:'🐷'},{es:'Pollo',en:'Chicken',emoji:'🐔'},
+  {es:'Pato',en:'Duck',emoji:'🦆'},{es:'Conejo',en:'Rabbit',emoji:'🐰'},
+  {es:'León',en:'Lion',emoji:'🦁'},{es:'Tigre',en:'Tiger',emoji:'🐯'},
+  {es:'Elefante',en:'Elephant',emoji:'🐘'},{es:'Jirafa',en:'Giraffe',emoji:'🦒'},
+  {es:'Mono',en:'Monkey',emoji:'🐵'},{es:'Oso',en:'Bear',emoji:'🐻'},
+  {es:'Lobo',en:'Wolf',emoji:'🐺'},{es:'Zorro',en:'Fox',emoji:'🦊'},
+  {es:'Pez',en:'Fish',emoji:'🐟'},{es:'Serpiente',en:'Snake',emoji:'🐍'},
+  {es:'Rana',en:'Frog',emoji:'🐸'},{es:'Mariposa',en:'Butterfly',emoji:'🦋'},
+];
+
+let iQuestions,iCurrent,iScore,iAnswered,iEnWord='',iSoundOn=true;
+
+function toggleSound(){
+  iSoundOn=!iSoundOn;
+  document.getElementById('i-soundbtn').textContent=iSoundOn?'🔊':'🔇';
+}
+
+function speak(word){
+  if(!iSoundOn||!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(word);
+  u.lang='en-US';u.rate=0.85;u.pitch=1.1;
+  const btn=document.getElementById('i-speakbtn');
+  if(btn)btn.classList.add('speaking');
+  u.onend=()=>{if(btn)btn.classList.remove('speaking');};
+  u.onerror=()=>{if(btn)btn.classList.remove('speaking');};
+  window.speechSynthesis.speak(u);
+}
+
+function speakCurrent(){speak(iEnWord);}
+
+function ingInit(){
+  iScore=0;iCurrent=0;iAnswered=false;
+  document.getElementById('i-score').textContent=0;
+  document.getElementById('i-qnum').textContent=1;
+  document.getElementById('i-bar').style.width='0%';
+  document.getElementById('i-fb').textContent='';
+  document.getElementById('i-fb').className='feedback';
+  document.getElementById('ing-game').style.display='block';
+  document.getElementById('ing-end').style.display='none';
+  iQuestions=shuffle([...animals]).slice(0,10).map(a=>({animal:a,askEn:Math.random()>0.5}));
+  iRender();
+}
+
+function iRender(){
+  if(iCurrent>=iQuestions.length){iEnd();return;}
+  iAnswered=false;
+  const q=iQuestions[iCurrent],a=q.animal;
+  iEnWord=a.en;
+  document.getElementById('i-emoji').textContent=a.emoji;
+  document.getElementById('i-label').textContent=q.askEn?'¿Cómo se dice en inglés?':'¿Cómo se dice en español?';
+  document.getElementById('i-word').textContent=q.askEn?a.es:a.en;
+  document.getElementById('i-qnum').textContent=iCurrent+1;
+  document.getElementById('i-bar').style.width=(iCurrent/iQuestions.length*100)+'%';
+  document.getElementById('i-fb').textContent='';
+  document.getElementById('i-fb').className='feedback';
+  const sb=document.getElementById('i-speakbtn');
+  if(q.askEn){sb.style.display='none';}
+  else{sb.style.display='inline-flex';sb.classList.remove('speaking');setTimeout(()=>speak(a.en),400);}
+  const correct=q.askEn?a.en:a.es;
+  const pool=animals.filter(x=>x!==a);shuffle(pool);
+  const opts=shuffle([correct,...pool.slice(0,3).map(x=>q.askEn?x.en:x.es)]);
+  const container=document.getElementById('i-opts');
+  container.innerHTML='';
+  opts.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='opt';btn.textContent=o;
+    btn.onclick=()=>iPick(btn,o,correct,q.askEn?a.en:'');
+    container.appendChild(btn);
+  });
+}
+
+function iPick(btn,chosen,correct,enWord){
+  if(iAnswered)return;
+  iAnswered=true;
+  const fb=document.getElementById('i-fb');
+  document.querySelectorAll('#i-opts .opt').forEach(b=>b.disabled=true);
+  if(chosen===correct){
+    btn.classList.add('correct');
+    fb.textContent='¡Muy bien! ✓';fb.className='feedback fb-ok';
+    iScore++;document.getElementById('i-score').textContent=iScore;
+    if(enWord)setTimeout(()=>speak(enWord),200);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#i-opts .opt').forEach(b=>{if(b.textContent===correct)b.classList.add('correct');});
+    fb.textContent='Era: '+correct;fb.className='feedback fb-no';
+    if(enWord)setTimeout(()=>speak(enWord),400);
+  }
+  setTimeout(()=>{iCurrent++;iRender();},enWord?1800:1300);
+}
+
+function iEnd(){
+  document.getElementById('ing-game').style.display='none';
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
+  const el=document.getElementById('ing-end');el.style.display='block';
+  const pct=iScore/iQuestions.length;
+  const emoji=pct===1?'🏆':pct>=0.7?'⭐':'💪';
+  const msg=pct===1?'¡Perfecto! ¡Todas correctas!':pct>=0.7?'¡Muy bien hecho!':'¡Sigue practicando!';
+  el.innerHTML=`<div class="endbox">
+    <span class="end-emoji">${emoji}</span>
+    <div class="end-title">${msg}</div>
+    <div class="end-sub">${iScore} de ${iQuestions.length} respuestas correctas</div>
+    <button class="g-btn" onclick="ingInit()">🔀 Jugar de nuevo</button>
+  </div>`;
+}
+</script>
+</body>
+</html>
